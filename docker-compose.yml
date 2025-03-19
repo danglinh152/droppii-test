@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  spring-boot-app:
+    image: droppii-test
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/droppii
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: "root_password123"  # Mật khẩu cho datasource
+    depends_on:
+      - mysql
+    restart: on-failure  # Khởi động lại khi gặp lỗi
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "root_password123"  # Mật khẩu cho tài khoản root
+      MYSQL_DATABASE: droppii
+      MYSQL_USER: user
+      MYSQL_PASSWORD: "user_password123"  # Mật khẩu cho người dùng
+    ports:
+      - "3306:3306"
