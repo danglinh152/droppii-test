@@ -34,7 +34,7 @@ public class Task implements Serializable {
     private String description;
 
     @Column(name = "due_date", nullable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss a", timezone = "GMT+7")
+//    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss a", timezone = "GMT+7")
     private Instant dueDate;
 
     @Column(name = "priority", nullable = false)

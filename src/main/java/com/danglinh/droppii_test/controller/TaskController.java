@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -38,9 +37,16 @@ public class TaskController {
 
     @GetMapping("/tasks/{id}")
     @ApiMessage("Get Task By Id")
-    public ResponseEntity<Task> getTask(@PathVariable Long id) {
+    public ResponseEntity<Task> getTask(@PathVariable Long id) throws DroppiiException {
+        if (id == null) {
+            throw new DroppiiException("Task id is null");
+        }
         Task task = taskService.getTaskById(id);
-        return ResponseEntity.ok(task);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(task);
+        }
     }
 
     @GetMapping("/tasks/{id}/dependencies")
@@ -88,7 +94,7 @@ public class TaskController {
 
     @PutMapping("/tasks/{id}")
     @ApiMessage("Update a Task")
-    public ResponseEntity<Task> updateTask(@Valid @RequestBody UpdatedTask requestUpdateTask, @PathVariable Long id) throws DroppiiException {
+    public ResponseEntity<Task> updateTask(@RequestBody UpdatedTask requestUpdateTask, @PathVariable Long id) throws DroppiiException {
         return ResponseEntity.ok(taskService.updateTask(requestUpdateTask, id));
     }
 
