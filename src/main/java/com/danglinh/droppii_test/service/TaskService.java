@@ -1,16 +1,20 @@
 package com.danglinh.droppii_test.service;
 
-import com.danglinh.droppii_test.domain.DTO.request.RequestUpdateTask;
+import com.danglinh.droppii_test.domain.DTO.request.UpdatedTask;
 import com.danglinh.droppii_test.domain.DTO.response.Meta;
 import com.danglinh.droppii_test.domain.DTO.response.ResponsePaginationDTO;
 import com.danglinh.droppii_test.domain.entity.Task;
 import com.danglinh.droppii_test.repository.TaskRepository;
 import com.danglinh.droppii_test.util.error.DroppiiException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -26,9 +30,10 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-
+    @Cacheable(value = "tasks")
     public ResponsePaginationDTO getAllTasks(Specification<Task> spec, Pageable pageable) {
         Page<Task> pageTasks = taskRepository.findAll(spec, pageable);
+
         Meta meta = new Meta();
         meta.setCurrentPage(pageable.getPageNumber() + 1);
         meta.setPageSize(pageable.getPageSize());
@@ -42,6 +47,8 @@ public class TaskService {
         return responsePaginationDTO;
     }
 
+
+    @Cacheable(value = "tasks", key = "#id")
     public Task getTaskById(Long id) {
         Optional<Task> task = taskRepository.findById(id);
         return task.orElse(null);
@@ -88,7 +95,16 @@ public class TaskService {
         taskRepository.save(task);
     }
 
-    public Task updateTask(RequestUpdateTask requestUpdateTask, Long id) throws DroppiiException {
+    public void removeDependency(Long taskId, Long dependencyId) throws DroppiiException {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new DroppiiException("Task not found"));
+        Set<Task> taskDep = task.getDependencies();
+        taskDep.remove(taskRepository.findById(dependencyId).orElseThrow(() -> new DroppiiException("Dependency not found")));
+
+        task.setDependencies(taskDep);
+        taskRepository.save(task);
+    }
+
+    public Task updateTask(UpdatedTask requestUpdateTask, Long id) throws DroppiiException {
         Task task = taskRepository.findById(id).orElseThrow(() -> new DroppiiException("Task not found"));
         task.setTitle(requestUpdateTask.getTitle());
         task.setDescription(requestUpdateTask.getDescription());
@@ -96,6 +112,7 @@ public class TaskService {
         task.setPriority(requestUpdateTask.getPriority());
         task.setCompleted(requestUpdateTask.isCompleted());
 
+//        nếu không truyền dependecies thì mặc định sẽ giữ nguyên dependencies hiện tại
         if (!requestUpdateTask.getDependencies().isEmpty()) {
             task.setDependencies(requestUpdateTask.getDependencies());
         }
@@ -103,11 +120,38 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    public Task completeTask(Long id) throws DroppiiException {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new DroppiiException("Không tìm thấy tác vụ với ID " + id));
 
+        Set<Task> taskDep = task.getDependencies();
+
+        // Kiểm tra xem tất cả các dependency đã hoàn thành chưa???
+        boolean isCompleteAll = taskDep.stream().allMatch(Task::isCompleted);
+
+        // Kiểm tra xem task đã quá hạn chưa???
+        Instant now = Instant.now();
+        boolean isOverDue = now.isAfter(task.getDueDate());
+
+
+        if (isCompleteAll && !isOverDue) {
+            task.setCompleted(true);
+            return taskRepository.save(task); // Lưu và trả về tác vụ đã cập nhật
+        } else if (!isCompleteAll && isOverDue) {
+            throw new DroppiiException("Task không thể hoàn thành vì đã quá hạn và có các dependency chưa hoàn thành.");
+        } else if (!isCompleteAll) {
+            throw new DroppiiException("Task không thể hoàn thành vì không phải tất cả các dependency đã hoàn thành.");
+        } else {
+            throw new DroppiiException("Task không thể hoàn thành vì đã quá hạn.");
+        }
+    }
+
+    @CachePut(value = "tasks", key = "#task.id")
     public Task addTask(Task task) {
         return taskRepository.save(task);
     }
 
+    @CacheEvict(value = "tasks", key = "#id")
     public boolean deleteTask(Long id) {
         // Find the task by ID
         Task task = taskRepository.findById(id)
@@ -118,8 +162,6 @@ public class TaskService {
         if (!dependentTasks.isEmpty()) {
             throw new RuntimeException("Cannot delete task. It has dependencies in other tasks.");
         }
-
-        // Proceed to delete the task
         taskRepository.delete(task);
         return true;
     }

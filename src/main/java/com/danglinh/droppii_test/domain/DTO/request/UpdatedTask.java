@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class RequestUpdateTask {
+public class UpdatedTask {
     private String title;
     private String description;
     private Instant dueDate;
@@ -15,10 +15,10 @@ public class RequestUpdateTask {
     private boolean completed;
     private Set<Task> dependencies = new HashSet<>();
 
-    public RequestUpdateTask() {
+    public UpdatedTask() {
     }
 
-    public RequestUpdateTask(String title, String description, Instant dueDate, int priority, boolean completed, Set<Task> dependencies) {
+    public UpdatedTask(String title, String description, Instant dueDate, int priority, boolean completed, Set<Task> dependencies) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;

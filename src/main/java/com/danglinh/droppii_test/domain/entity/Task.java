@@ -1,51 +1,57 @@
 package com.danglinh.droppii_test.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity // Khai báo rằng lớp Task là entity
-@Table(name = "Task") // Lớp Task thuộc table Task trong cơ sở dữ liệu
-public class Task {
+@Entity
+@Table(name = "Task")
+public class Task implements Serializable {
 
-    @Id // Đánh dấu thuộc tính id là Id của bảng Task
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // Tự động phát sinh giá trị cho thuộc tính id với các giá trị tăng dần
-    @Column(name = "task_id") // Thuộc tính id thuộc cột task_id trong cơ sở dữ liệu
+    @Column(name = "task_id")
     private Long id;
 
     @Column(name = "title", nullable = false)
-    // Thuộc tính title thuộc cột title trong cơ sở dữ liệu và cột title sẽ là NOT NULL
     @NotBlank(message = "title không được để trống!")
     private String title;
 
     @Column(name = "description", columnDefinition = "LONGTEXT", nullable = false)
-    // Thuộc tính description thuộc cột description trong cơ sở dữ liệu và cột này sẽ là NOT NULL với kiểu dữ liệu LONGTEXT
     @NotBlank(message = "description không được để trống!")
     private String description;
 
     @Column(name = "due_date", nullable = false)
-    // Thuộc tính due_date thuộc cột due_date trong cơ sở dữ liệu và cột này sẽ là NOT NULL
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss a", timezone = "GMT+7")
     private Instant dueDate;
 
     @Column(name = "priority", nullable = false)
-    // Thuộc tính priority thuộc cột priority trong cơ sở dữ liệu và cột này sẽ là NOT NULL
     private int priority;
 
     @Column(name = "completed", nullable = false)
-    // Thuộc tính completed thuộc cột completed trong cơ sở dữ liệu và cột này sẽ là NOT NULL
-    private boolean completed = false; // Mặc định completed có giá trị là FALSE
+    private boolean completed = false;
 
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "task_dependencies",
             joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "dependency_id")
     )
     private Set<Task> dependencies = new HashSet<>();
+
 
     public Task() {
     }
@@ -115,4 +121,5 @@ public class Task {
     public void setDependencies(Set<Task> dependencies) {
         this.dependencies = dependencies;
     }
+
 }

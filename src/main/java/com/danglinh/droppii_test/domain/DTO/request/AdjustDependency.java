@@ -1,14 +1,14 @@
 package com.danglinh.droppii_test.domain.DTO.request;
 
 
-public class RequestAddDependency {
+public class AdjustDependency {
     private Long taskId;
     private Long dependencyId;
 
-    public RequestAddDependency() {
+    public AdjustDependency() {
     }
 
-    public RequestAddDependency(Long dependencyId, Long taskId) {
+    public AdjustDependency(Long dependencyId, Long taskId) {
         this.dependencyId = dependencyId;
         this.taskId = taskId;
     }

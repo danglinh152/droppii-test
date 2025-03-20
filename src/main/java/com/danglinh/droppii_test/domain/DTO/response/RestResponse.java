@@ -1,9 +1,6 @@
 package com.danglinh.droppii_test.domain.DTO.response;
 
 
-
-
-
 public class RestResponse<T> {
     private int statusCode;
     private String error;

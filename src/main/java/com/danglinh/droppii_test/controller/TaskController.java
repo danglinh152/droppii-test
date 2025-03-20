@@ -1,8 +1,8 @@
 package com.danglinh.droppii_test.controller;
 
 
-import com.danglinh.droppii_test.domain.DTO.request.RequestAddDependency;
-import com.danglinh.droppii_test.domain.DTO.request.RequestUpdateTask;
+import com.danglinh.droppii_test.domain.DTO.request.AdjustDependency;
+import com.danglinh.droppii_test.domain.DTO.request.UpdatedTask;
 import com.danglinh.droppii_test.domain.DTO.response.ResponseGetDependencies;
 import com.danglinh.droppii_test.domain.DTO.response.ResponsePaginationDTO;
 import com.danglinh.droppii_test.domain.entity.Task;
@@ -15,9 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 
@@ -74,22 +74,28 @@ public class TaskController {
 
     @PostMapping("/add-dependency")
     @ApiMessage("Add Dependency For a Task")
-    public ResponseEntity<String> addDependency(@RequestBody RequestAddDependency requestAddDependency) throws DroppiiException {
-        taskService.addDependency(requestAddDependency.getTaskId(), requestAddDependency.getDependencyId());
+    public ResponseEntity<String> addDependency(@RequestBody AdjustDependency adjustDependency) throws DroppiiException {
+        taskService.addDependency(adjustDependency.getTaskId(), adjustDependency.getDependencyId());
         return ResponseEntity.status(HttpStatus.CREATED).body("ok");
     }
 
-//    @DeleteMapping("/add-dependency")
-//    @ApiMessage("Remove Dependency For a Task")
-//    public ResponseEntity<String> removeDependency(@RequestBody RequestRemoveDependency requestRemoveDependency) throws DroppiiException {
-//        taskService.addDependency(requestRemoveDependency.getTaskId(), requestRemoveDependency.getDependencyId());
-//        return ResponseEntity.status(HttpStatus.CREATED).body("ok");
-//    }
+    @DeleteMapping("/remove-dependency")
+    @ApiMessage("Remove Dependency For a Task")
+    public ResponseEntity<String> removeDependency(@RequestBody AdjustDependency adjustDependency) throws DroppiiException {
+        taskService.removeDependency(adjustDependency.getTaskId(), adjustDependency.getDependencyId());
+        return ResponseEntity.status(HttpStatus.CREATED).body("ok");
+    }
 
     @PutMapping("/tasks/{id}")
     @ApiMessage("Update a Task")
-    public ResponseEntity<Task> updateTask(@Valid @RequestBody RequestUpdateTask requestUpdateTask, @PathVariable Long id) throws DroppiiException {
+    public ResponseEntity<Task> updateTask(@Valid @RequestBody UpdatedTask requestUpdateTask, @PathVariable Long id) throws DroppiiException {
         return ResponseEntity.ok(taskService.updateTask(requestUpdateTask, id));
+    }
+
+    @PutMapping("/tasks/complete-task/{id}")
+    @ApiMessage("Complete a Task")
+    public ResponseEntity<Task> completeTask(@PathVariable Long id) throws DroppiiException {
+        return ResponseEntity.ok(taskService.completeTask(id));
     }
 
     @DeleteMapping("/tasks/{id}")

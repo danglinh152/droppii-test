@@ -1,10 +1,8 @@
 package com.danglinh.droppii_test.domain.DTO.response;
 
+import java.io.Serializable;
 
-
-
-
-public class ResponsePaginationDTO {
+public class ResponsePaginationDTO implements Serializable {
     private Meta meta;
     private Object data;
 

@@ -2,18 +2,21 @@ version: '3.8'
 
 services:
   spring-boot-app:
-    image: droppii-test
+    image: droppii-test # Đặt tên image là droppii-test
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: . # Context là pwd
+      dockerfile: Dockerfile # Dockerfile
     ports:
-      - "8080:8080"
+      - "8080:8080" # Mapping port
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/droppii
-      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/droppii # Đường dẫn tới datasource
+      SPRING_DATASOURCE_USERNAME: root # Username root
       SPRING_DATASOURCE_PASSWORD: "root_password123"  # Mật khẩu cho datasource
-    depends_on:
+      SPRING_REDIS_HOST: redis # Host Redis
+      SPRING_REDIS_PORT: 6379 # Port Redis
+    depends_on: # Phụ thuộc vào mysql và redis
       - mysql
+      - redis
     restart: on-failure  # Khởi động lại khi gặp lỗi
 
   mysql:
@@ -21,8 +24,14 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: "root_password123"  # Mật khẩu cho tài khoản root
-      MYSQL_DATABASE: droppii
-      MYSQL_USER: user
-      MYSQL_PASSWORD: "user_password123"  # Mật khẩu cho người dùng
+      MYSQL_DATABASE: droppii # Tên db
+      MYSQL_USER: user # tài khoản user
+      MYSQL_PASSWORD: "user_password123"  # Mật khẩu cho user
     ports:
-      - "3306:3306"
+      - "3306:3306" # mapping port
+
+  redis:
+    image: redis:alpine # Sử dụng Redis Alpine
+    ports:
+      - "6379:6379" # Mapping port Redis
+    restart: always # Khởi động lại khi gặp lỗi

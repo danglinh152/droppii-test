@@ -1,8 +1,9 @@
 package com.danglinh.droppii_test.domain.DTO.response;
 
 
+import java.io.Serializable;
 
-public class Meta {
+public class Meta implements Serializable {
     private int currentPage;
     private int pageSize;
     private int totalPages;
