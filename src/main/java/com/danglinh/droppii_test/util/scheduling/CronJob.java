@@ -25,7 +25,7 @@ public class CronJob {
         List<Task> dueTasks = taskRepository.findAllByDueDateBetweenAndCompletedFalse(now, nextDay);
 
         for (Task task : dueTasks) {
-            System.out.println("Task due within 24 hours: " + task.getTitle() + ", Due date: " + task.getDueDate());
+            System.out.println("Công việc sẽ hết hạn trong 24 giờ: " + task.getTitle() + ", Hạn chót: " + task.getDueDate());
         }
     }
 

@@ -128,7 +128,7 @@ public class TaskService {
     @CacheEvict(value = "tasks", key = "#id")
     public Task completeTask(Long id) throws DroppiiException {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new DroppiiException("Không tìm thấy task với ID " + id));
+                .orElseThrow(() -> new DroppiiException("Task not found with ID " + id));
 
         Set<Task> taskDep = task.getDependencies();
 
@@ -141,11 +141,11 @@ public class TaskService {
             task.setCompleted(true);
             return taskRepository.save(task); // Save and return updated task
         } else if (!isCompleteAll && isOverDue) {
-            throw new DroppiiException("Task không thể hoàn thành vì đã quá hạn và có các dependency chưa hoàn thành.");
+            throw new DroppiiException("Task cannot be completed because it is overdue and has incomplete dependencies.");
         } else if (!isCompleteAll) {
-            throw new DroppiiException("Task không thể hoàn thành vì không phải tất cả các dependency đã hoàn thành.");
+            throw new DroppiiException("Task cannot be completed because not all dependencies are completed.");
         } else {
-            throw new DroppiiException("Task không thể hoàn thành vì đã quá hạn.");
+            throw new DroppiiException("Task cannot be completed because it is overdue.");
         }
     }
 
