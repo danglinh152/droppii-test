@@ -23,11 +23,11 @@ public class Task implements Serializable {
     private Long id;
 
     @Column(name = "title", nullable = false)
-    @NotBlank(message = "title không được để trống!")
+    @NotBlank(message = "title cannot be blank!")
     private String title;
 
     @Column(name = "description", columnDefinition = "LONGTEXT", nullable = false)
-    @NotBlank(message = "description không được để trống!")
+    @NotBlank(message = "description cannot be blank!")
     private String description;
 
     @Column(name = "due_date", nullable = false)
@@ -71,19 +71,19 @@ public class Task implements Serializable {
         this.id = id;
     }
 
-    public @NotBlank(message = "title không được để trống!") String getTitle() {
+    public @NotBlank(message = "title cannot be blank!") String getTitle() {
         return title;
     }
 
-    public void setTitle(@NotBlank(message = "title không được để trống!") String title) {
+    public void setTitle(@NotBlank(message = "title cannot be blank!") String title) {
         this.title = title;
     }
 
-    public @NotBlank(message = "description không được để trống!") String getDescription() {
+    public @NotBlank(message = "description cannot be blank!") String getDescription() {
         return description;
     }
 
-    public void setDescription(@NotBlank(message = "description không được để trống!") String description) {
+    public void setDescription(@NotBlank(message = "description cannot be blank!") String description) {
         this.description = description;
     }
 
