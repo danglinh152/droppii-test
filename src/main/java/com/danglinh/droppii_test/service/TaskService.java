@@ -130,10 +130,8 @@ public class TaskService {
 
         Set<Task> taskDep = task.getDependencies();
 
-        // Check if all dependencies are completed
         boolean isCompleteAll = taskDep.stream().allMatch(Task::isCompleted);
 
-        // Check if the task is overdue
         Instant now = Instant.now();
         boolean isOverDue = now.isAfter(task.getDueDate());
 

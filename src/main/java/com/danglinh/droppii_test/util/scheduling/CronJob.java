@@ -16,42 +16,21 @@ public class CronJob {
         this.taskRepository = taskRepository;
     }
 
-    @Scheduled(cron = "0 0 0 * * MON") // at 00h00 at Monday day
-    public void printMonday() {
-        System.out.println("Monday");
-    }
+    //    Tasks due within 24 hours:
+    @Scheduled(cron = "0 0 0 * * *") // at 00h00 everydayyyyy
+    public void notifyDueTasksInNext24Hours() {
+        Instant now = Instant.now();
+        Instant nextDay = now.plusSeconds(86400); // 24 hours later
 
-    @Scheduled(cron = "0 0 0 * * TUE") // at 00h00 at Tuesday day
-    public void printTuesday() {
-        System.out.println("Tuesday");
-    }
+        List<Task> dueTasks = taskRepository.findAllByDueDateBetweenAndCompletedFalse(now, nextDay);
 
-    @Scheduled(cron = "0 0 0 * * WED") // at 00h00 at Wednesday day
-    public void printWednesday() {
-        System.out.println("Wednesday");
-    }
-
-    @Scheduled(cron = "0 0 0 * * THU") // at 00h00 at Thursday day
-    public void printThursday() {
-        System.out.println("Thursday");
-    }
-
-    @Scheduled(cron = "0 0 0 * * FRI") // at 00h00 at Friday day
-    public void printFriday() {
-        System.out.println("Friday");
-    }
-
-    @Scheduled(cron = "0 0 0 * * SAT") // at 00h00 at Saturday day
-    public void printSaturday() {
-        System.out.println("Saturday");
-    }
-
-    @Scheduled(cron = "0 0 0 * * SUN") // at 00h00 at Sunday day
-    public void printSunday() {
-        System.out.println("Sunday");
+        for (Task task : dueTasks) {
+            System.out.println("Task due within 24 hours: " + task.getTitle() + ", Due date: " + task.getDueDate());
+        }
     }
 
 
+    //    Overdue Tasks:
     @Scheduled(cron = "0 0 0 * * *") // at 00h00 everydayyyyy
     public void notifyOverdueTasks() {
         List<Task> overdueTasks = taskRepository.findAllByDueDateBeforeAndCompletedFalse(Instant.now());

@@ -1,7 +1,6 @@
 package com.danglinh.droppii_test.repository;
 
 import com.danglinh.droppii_test.domain.entity.Task;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -14,4 +13,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     List<Task> findByDependenciesContaining(Task dependency);
 
     List<Task> findAllByDueDateBeforeAndCompletedFalse(Instant now);
+
+    List<Task> findAllByDueDateBetweenAndCompletedFalse(Instant from, Instant to);
 }

@@ -32,7 +32,13 @@ public class TaskController {
     @GetMapping("/tasks")
     @ApiMessage("Get All Tasks")
     public ResponseEntity<ResponsePaginationDTO> getAllTask(@Filter Specification<Task> spec, Pageable pageable) {
-        return ResponseEntity.ok(taskService.getAllTasks(spec, pageable));
+        ResponsePaginationDTO responsePaginationDTO = taskService.getAllTasks(spec, pageable);
+
+        if (responsePaginationDTO == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(responsePaginationDTO);
+        }
     }
 
     @GetMapping("/tasks/{id}")
@@ -82,14 +88,14 @@ public class TaskController {
     @ApiMessage("Add Dependency For a Task")
     public ResponseEntity<String> addDependency(@RequestBody AdjustDependency adjustDependency) throws DroppiiException {
         taskService.addDependency(adjustDependency.getTaskId(), adjustDependency.getDependencyId());
-        return ResponseEntity.status(HttpStatus.CREATED).body("ok");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Added Dependency");
     }
 
     @DeleteMapping("/remove-dependency")
     @ApiMessage("Remove Dependency For a Task")
     public ResponseEntity<String> removeDependency(@RequestBody AdjustDependency adjustDependency) throws DroppiiException {
         taskService.removeDependency(adjustDependency.getTaskId(), adjustDependency.getDependencyId());
-        return ResponseEntity.status(HttpStatus.CREATED).body("ok");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Removed Dependency");
     }
 
     @PutMapping("/tasks/{id}")
