@@ -41,8 +41,10 @@ public class TaskService {
 
         ResponsePaginationDTO responsePaginationDTO = new ResponsePaginationDTO();
         responsePaginationDTO.setMeta(meta);
+        if (pageTasks.getContent().isEmpty()) {
+            return null;
+        }
         responsePaginationDTO.setData(pageTasks.getContent());
-
         return responsePaginationDTO;
     }
 
